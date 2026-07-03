@@ -22,7 +22,7 @@ Thanks for your interest in contributing! Here's how to get involved.
 
 ## Code Style
 
-Yes, `server.py` is a 2400-line monolith. It works. If you want to refactor parts into modules, that's welcome — just make sure nothing breaks.
+Yes, `server.py` is a ~2,700-line monolith. It works. If you want to refactor parts into modules, that's welcome — just make sure nothing breaks.
 
 - Keep voice responses short (1-2 sentences max)
 - Don't add dependencies unless necessary

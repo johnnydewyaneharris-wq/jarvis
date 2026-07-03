@@ -18,7 +18,9 @@ import yaml
 log = logging.getLogger("jarvis.evolution")
 
 TEMPLATES_DIR = Path(__file__).parent / "templates" / "prompts"
-DB_PATH = Path(__file__).parent / "jarvis_data.db"
+from db_paths import intelligence_db_path
+
+DB_PATH = intelligence_db_path()
 
 # Common failure patterns and their fixes
 FAILURE_PATTERNS = {

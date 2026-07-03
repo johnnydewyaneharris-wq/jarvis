@@ -30,6 +30,7 @@ cd frontend && npm run dev
 cd frontend && npm run build
 
 # Tests (pytest + pytest-asyncio)
+pip install -r requirements-dev.txt
 pytest tests/
 pytest tests/test_feedback_loop.py -k test_name   # single test
 python3 tests/test_classifier.py                  # standalone script; needs ANTHROPIC_API_KEY
@@ -37,7 +38,7 @@ python3 tests/test_classifier.py                  # standalone script; needs ANT
 # Log monitor (runs alongside the server, flags conversation-quality issues)
 python monitor.py
 ```
-There is no linter configured. Browser tests (`test_browser_integration.py`) need network + Playwright browsers and skip themselves otherwise; `test_e2e_pipeline.py` and `test_feedback_loop.py` mock Claude Code execution and run anywhere.
+There is no linter configured. Browser tests (`test_browser_integration.py`) need network + Playwright browsers and skip themselves otherwise; `test_e2e_pipeline.py` and `test_feedback_loop.py` mock Claude Code execution and run anywhere. CI (`.github/workflows/ci.yml`) runs `pytest tests/` and the frontend build on every PR.
 
 ## Architecture
 
@@ -56,9 +57,9 @@ When the user asks JARVIS to build something, the request flows through a pipeli
 5. `qa.py` — a QA agent (another `claude -p` subprocess) verifies the output and auto-retries up to 3 times.
 6. `tracking.py` → `evolution.py` — success/failure metrics feed template evolution, which writes improved template versions back to `templates/prompts/`; `learning.py` tracks usage patterns to pre-load context. `suggestions.py` offers one heuristic follow-up per completed task (file checks, no LLM calls).
 
-### Storage — two SQLite databases
+### Storage — two SQLite databases, both in `data/`
 - `data/jarvis.db` — user-facing memory (`memory.py`, FTS5 full-text search) and the dispatch registry.
-- `jarvis_data.db` — intelligence-layer metrics (`tracking.py`, `learning.py`, `ab_testing.py`, `evolution.py`).
+- `data/jarvis_data.db` — intelligence-layer metrics (`tracking.py`, `learning.py`, `ab_testing.py`, `evolution.py`). The path comes from `db_paths.intelligence_db_path()`, which auto-migrates a legacy root-level `jarvis_data.db` if one exists.
 
 ### macOS integration
 All system access goes through AppleScript (`calendar_access.py`, `mail_access.py`, `notes_access.py`, `actions.py`, `screen.py`) — no OAuth. Any string interpolated into AppleScript must go through `applescript_escape()` (`actions.py`); `tests/test_applescript_escape.py` guards this. `JARVIS_SKIP_PERMISSIONS` defaults to true because voice-driven `claude` subprocesses can't answer interactive permission prompts (they'd hang silently).

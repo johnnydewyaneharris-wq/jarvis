@@ -12,7 +12,9 @@ from typing import Optional
 
 log = logging.getLogger("jarvis.tracking")
 
-DB_PATH = Path(__file__).parent / "jarvis_data.db"
+from db_paths import intelligence_db_path
+
+DB_PATH = intelligence_db_path()
 
 
 class SuccessTracker:

@@ -30,7 +30,18 @@ def _has_network() -> bool:
         return False
 
 
-NETWORK_AVAILABLE = _has_network()
+def _has_browser() -> bool:
+    """Check if Playwright's Chromium is actually installed."""
+    try:
+        from playwright.sync_api import sync_playwright
+
+        with sync_playwright() as p:
+            return Path(p.chromium.executable_path).exists()
+    except Exception:
+        return False
+
+
+NETWORK_AVAILABLE = _has_network() and _has_browser()
 SKIP_REASON = "No network or Playwright browsers not available"
 
 
@@ -160,15 +171,24 @@ async def test_browser_research(browser):
 # ── Action Detection ─────────────────────────────────────────────────
 
 
-def test_browse_action_keywords():
-    """Action keywords include browse-related terms."""
-    from server import ACTION_KEYWORDS
+def test_extract_browse_action():
+    """[ACTION:BROWSE] tags are parsed out of LLM responses."""
+    from server import extract_action
 
-    assert "browse" in ACTION_KEYWORDS
-    browse_keywords = ACTION_KEYWORDS["browse"]
-    assert "search for" in browse_keywords
-    assert "look up" in browse_keywords
-    assert "google" in browse_keywords
+    text, action = extract_action(
+        "Right away, sir. [ACTION:BROWSE] best restaurants in Austin"
+    )
+    assert text == "Right away, sir."
+    assert action == {"action": "browse", "target": "best restaurants in Austin"}
+
+
+def test_extract_action_no_tag():
+    """Responses without an action tag pass through unchanged."""
+    from server import extract_action
+
+    text, action = extract_action("Just a normal reply, sir.")
+    assert text == "Just a normal reply, sir."
+    assert action is None
 
 
 # ── Browser Lifecycle ─────────────────────────────────────────────────

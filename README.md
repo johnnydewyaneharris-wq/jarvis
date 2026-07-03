@@ -114,7 +114,7 @@ Microphone -> Web Speech API -> WebSocket -> FastAPI -> Claude (Haiku) -> Fish A
 
 | Layer | Technology |
 |-------|-----------|
-| Backend | FastAPI + Python (`server.py`, ~2300 lines) |
+| Backend | FastAPI + Python (`server.py`, ~2,700 lines) |
 | Frontend | Vite + TypeScript + Three.js |
 | Communication | WebSocket (JSON messages + binary audio) |
 | AI (fast) | Claude Haiku -- low-latency voice responses |
@@ -168,6 +168,15 @@ JARVIS remembers things you tell it using SQLite with FTS5 full-text search. Pre
 
 ### Calendar & Mail
 All macOS integrations use AppleScript -- no OAuth flows, no token management. Just native system access. Mail is intentionally read-only for safety.
+
+## Running Tests
+
+```bash
+pip install -r requirements-dev.txt
+pytest tests/
+```
+
+Browser tests skip themselves when network or Playwright browsers aren't available. CI runs the test suite and the frontend build on every pull request.
 
 ## Contributing
 

@@ -20,7 +20,9 @@ import yaml
 log = logging.getLogger("jarvis.ab_testing")
 
 TEMPLATES_DIR = Path(__file__).parent / "templates" / "prompts"
-DB_PATH = Path(__file__).parent / "jarvis_data.db"
+from db_paths import intelligence_db_path
+
+DB_PATH = intelligence_db_path()
 
 # Minimum tasks per version before declaring a winner
 MIN_TASKS_FOR_WINNER = 20
